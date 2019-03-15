@@ -3,23 +3,29 @@
 // grabbed from https://docs.unity3d.com/ScriptReference/Physics2D.Simulate.html
 
 public class BasicSimulation : MonoBehaviour {
-	[Range(0, 1)]
+
 	private float timer;
 
-	void FixedUpdate() {
+	private void Start() {
+		SetGameSpeed(Settings.Actual.gameSpeed);
+	}
+
+	private void Update() {
 		if (Physics2D.autoSimulation)
-			return; // do nothing if the automatic simulation is enabled
+			return;
 
-		timer += Time.deltaTime;
+		timer += Time.deltaTime * Settings.Actual.gameSpeed;
 
-		// Catch up with the game time.
-		// Advance the physics simulation in portions of Time.fixedDeltaTime
-		// Note that generally, we don't want to pass variable delta to Simulate as that leads to unstable results.
 		while (timer >= Time.fixedDeltaTime) {
 			timer -= Time.fixedDeltaTime;
-			Physics2D.Simulate(Time.fixedDeltaTime * Settings.actual.gameSpeed);
+			Physics2D.Simulate(Time.fixedDeltaTime);
 		}
+	}
 
-		// Here you can access the transforms state right after the simulation, if needed...
+	public static void SetGameSpeed(float gameSpeed) {
+		if (gameSpeed >= 1f)
+			Time.fixedDeltaTime = .005f;
+		else
+			Time.fixedDeltaTime = .001f;
 	}
 }
