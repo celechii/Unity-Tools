@@ -41,6 +41,10 @@ public static class Extensions {
 		return v;
 	}
 
+	public static bool IsUpper(this char c) => c >= 'A' && c <= 'Z';
+
+	public static bool IsLower(this char c) => c >= 'a' && c <= 'z';
+
 
 	// from freya holmér <3
 	// https://twitter.com/FreyaHolmer/status/1068280371907883008
@@ -51,7 +55,7 @@ public static class Extensions {
 		return Mathf.Pow(2, exp);
 	}
 
-	// from ashley @khyperia
+	// from ashley @khyperia <3
 	// https://twitter.com/khyperia
 	// https://twitter.com/FreyaHolmer/status/1068293398073929728
 	public static float Eerp(float a, float b, float t) {
