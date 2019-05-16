@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
@@ -10,6 +10,8 @@ public class SimpleAnimator : MonoBehaviour {
 	private int frameRate;
 	[SerializeField]
 	private int variation;
+	[SerializeField]
+	private int initialOffset;
 
 	private SpriteRenderer spriteRenderer;
 	private int index;
@@ -21,7 +23,7 @@ public class SimpleAnimator : MonoBehaviour {
 
 		while (true) {
 
-			spriteRenderer.sprite = frames[index];
+			spriteRenderer.sprite = frames[(index + initialOffset) % frames.Length];
 
 			yield return new WaitForSeconds(1f / actualFrameRate);
 			index = (index + 1) % frames.Length;
