@@ -5,29 +5,57 @@ using UnityEngine;
 public class SimpleAnimator : MonoBehaviour {
 
 	[SerializeField]
+	private bool playOnStart = true;
+	[SerializeField]
+	private PlayType playType;
+	[SerializeField]
 	private Sprite[] frames;
+	[Space]
 	[SerializeField]
 	private int frameRate;
 	[SerializeField]
-	private int variation;
+	private int frameRateVariation;
 	[SerializeField]
 	private int initialOffset;
 
 	private SpriteRenderer spriteRenderer;
 	private int index;
 
-	private IEnumerator Start() {
+	private void Start() {
+		if (playOnStart)
+			StartCoroutine(Run());
+	}
+
+	private IEnumerator Run() {
 
 		spriteRenderer = GetComponent<SpriteRenderer>();
-		float actualFrameRate = frameRate + Random.Range(-variation, variation);
+		float actualFrameRate = frameRate + Random.Range(-frameRateVariation, frameRateVariation);
 
-		while (true) {
+		if (playType == PlayType.Loop) {
+			while (true) {
 
-			spriteRenderer.sprite = frames[(index + initialOffset) % frames.Length];
+				spriteRenderer.sprite = frames[(index + initialOffset) % frames.Length];
 
-			yield return new WaitForSeconds(1f / actualFrameRate);
-			index = (index + 1) % frames.Length;
+				yield return new WaitForSeconds(1f / actualFrameRate);
+				index = (index + 1) % frames.Length;
+			}
+
+		} else if (playType == PlayType.Once) {
+
+			for (int i = initialOffset; i < frames.Length; i++) {
+				spriteRenderer.sprite = frames[i];
+				yield return new WaitForSeconds(1f / actualFrameRate);
+			}
 		}
+	}
+
+	public void Play() {
+		StartCoroutine(Run());
+	}
+
+	private enum PlayType {
+		Loop,
+		Once
 	}
 
 }
