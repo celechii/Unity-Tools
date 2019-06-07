@@ -1,12 +1,14 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine;
 
 public static class Extensions {
 
 	public static string ToHexRGBA(this Color c) {
-		string r = ((int) Mathf.Lerp(0, 255, c.r)).ToString("X");
-		string g = ((int) Mathf.Lerp(0, 255, c.g)).ToString("X");
-		string b = ((int) Mathf.Lerp(0, 255, c.b)).ToString("X");
-		string a = ((int) Mathf.Lerp(0, 255, c.a)).ToString("X");
+		string r = ((int)Mathf.Lerp(0, 255, c.r)).ToString("X");
+		string g = ((int)Mathf.Lerp(0, 255, c.g)).ToString("X");
+		string b = ((int)Mathf.Lerp(0, 255, c.b)).ToString("X");
+		string a = ((int)Mathf.Lerp(0, 255, c.a)).ToString("X");
 		return (r.Length == 2 ? r : "0" + r) + (g.Length == 2 ? g : "0" + g) + (b.Length == 2 ? b : "0" + b) + (a.Length == 2 ? a : "0" + a);
 	}
 
@@ -45,6 +47,14 @@ public static class Extensions {
 
 	public static bool IsLower(this char c) => c >= 'a' && c <= 'z';
 
+	public static T DeepCopy<T>(T other) {
+		using(MemoryStream ms = new MemoryStream()) {
+			BinaryFormatter formatter = new BinaryFormatter();
+			formatter.Serialize(ms, other);
+			ms.Position = 0;
+			return (T)formatter.Deserialize(ms);
+		}
+	}
 
 	// from freya holmér <3
 	// https://twitter.com/FreyaHolmer/status/1068280371907883008
