@@ -66,6 +66,16 @@ public abstract class FuckingAngles {
 	}
 
 	/// <summary>
+	/// Returns the angle of the vector direction.
+	/// (Range of 0º to 359º)
+	/// </summary>
+	/// <param name="direction">The direction.</param>
+	/// <param name="offset">Offset angle.</param>
+	public static float AngleBetweenV2(Vector2 direction, float offset) {
+		return AddToAngle(Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg, offset);
+	}
+
+	/// <summary>
 	/// Returns the angle between two vector positions.
 	/// (Range of 0º to 359º)
 	/// </summary>
@@ -74,5 +84,27 @@ public abstract class FuckingAngles {
 	public static float AngleBetweenV2(Vector2 a, Vector2 b) {
 		Vector2 direction = b - a;
 		return AngleBetweenV2(direction);
+	}
+
+	/// <summary>
+	/// Returns the angle between two vector positions.
+	/// (Range of 0º to 359º)
+	/// </summary>
+	/// <param name="a">The start position.</param>
+	/// <param name="b">The end position.</param>
+	public static float AngleBetweenV2(Vector2 a, Vector2 b, float offset) {
+		Vector2 direction = b - a;
+		return AngleBetweenV2(direction, offset);
+	}
+
+	public static float AddToAngle(float angle, float amount) {
+		angle += amount;
+		if (angle > 360)
+			while (angle > 360)
+				angle -= 360;
+		else if (angle < 0)
+			while (angle < 0)
+				angle += 360;
+		return angle;
 	}
 }
