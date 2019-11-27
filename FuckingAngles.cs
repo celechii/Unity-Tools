@@ -107,4 +107,7 @@ public abstract class FuckingAngles {
 				angle += 360;
 		return angle;
 	}
+
+	public static Vector2 GetPerpendicular(Vector2 dir, int direction) => new Vector2(dir.y * Mathf.Sign(direction), dir.x * -Mathf.Sign(direction));
+
 }
