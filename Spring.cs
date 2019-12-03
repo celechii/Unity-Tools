@@ -11,18 +11,36 @@ public class Spring : MonoBehaviour {
 	private Vector2 vel;
 
 	private void Update() {
+		// credit this bit from wilhelm nylund @wilnyl
+		// https://twitter.com/wilnyl/status/1201516498445058048?s=20
 		vel += (targetPos - (Vector2)transform.localPosition) * spring - (vel * damper);
 		transform.Translate(vel * Time.deltaTime);
 	}
 
+	/// <summary>
+	/// Push the GameObject in a direction.
+	/// </summary>
+	/// <param name="dir">The direction of the force applied.</param>
+	/// <param name="amount">The magnitude of the force applied.</param>
 	public void Push(Vector2 dir, float amount) {
 		Push(dir * amount);
 	}
 
+	/// <summary>
+	/// Push the GameObject in a direction.
+	/// </summary>
+	/// <param name="force">The force to apply to the GameObject.</param>
 	public void Push(Vector2 force) {
 		vel += force;
 	}
 
+	/// <summary>
+	/// Shake the GameObject.
+	/// </summary>
+	/// <param name="intensity">The intensity of the force applied.</param>
+	/// <param name="duration">The duration of the shake.</param>
+	/// <param name="frequency">How frequently the GameObject should be pushed in a different direction.</param>
+	/// <param name="realTime">Is the frequency in real time or time as per the scaled time?</param>
 	public void Shake(float intensity, float duration, float frequency = .1f, bool realTime = false) {
 		StartCoroutine(DoShake(intensity, duration, frequency, realTime));
 	}
