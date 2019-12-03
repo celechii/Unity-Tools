@@ -6,15 +6,12 @@ public class Spring : MonoBehaviour {
 	public float spring = 50;
 	[Range(0, 1)]
 	public float damper = .35f;
-	public float forceMultiplier;
 	public Vector2 targetPos;
 
 	private Vector2 vel;
 
 	private void Update() {
-		vel += (targetPos - (Vector2)transform.localPosition) * spring;
-		vel -= vel * damper;
-
+		vel += (targetPos - (Vector2)transform.localPosition) * spring - (vel * damper);
 		transform.Translate(vel * Time.deltaTime);
 	}
 
