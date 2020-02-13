@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 public class ScreenResolutionSetter : MonoBehaviour {
 
@@ -7,10 +8,20 @@ public class ScreenResolutionSetter : MonoBehaviour {
 	public bool fullscreen;
 	public Vector2Int targetWindowAspect;
 	public Vector2Int targetResolution;
+	public bool fToToggleFullscreen = true;
+	public UnityEvent OnToggleFullscreen;
 
 	private void Awake() {
 		if (setPrefOnLoad)
 			SetResolution();
+	}
+
+	private void Update() {
+		if (fToToggleFullscreen && Input.GetKeyDown(KeyCode.F)) {
+			fullscreen = !fullscreen;
+			SetResolution();
+			OnToggleFullscreen.Invoke();
+		}
 	}
 
 	public void SetResolution() {
