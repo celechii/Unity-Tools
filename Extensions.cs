@@ -43,6 +43,12 @@ public static class Extensions {
 		return v;
 	}
 
+	public static Transform GetGrandChild(this Transform trans) {
+		if (trans.childCount == 0)
+			return trans;
+		return trans.GetChild(0).GetGrandChild();
+	}
+
 	public static bool IsUpper(this char c) => c >= 'A' && c <= 'Z';
 
 	public static bool IsLower(this char c) => c >= 'a' && c <= 'z';
