@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
@@ -16,6 +18,21 @@ public static class Extensions {
 		string cHex = c.ToHexRGBA();
 		return "<color=#" + cHex + ">" + s + "</color>";
 	}
+
+	public static Gradient AsGradient(this Color c) {
+		Gradient grad = new Gradient();
+		grad.colorKeys = new GradientColorKey[] {
+			new GradientColorKey(c, 0),
+				new GradientColorKey(c, 1),
+		};
+		grad.alphaKeys = new GradientAlphaKey[] {
+			new GradientAlphaKey(c.a, 0),
+				new GradientAlphaKey(c.a, 1),
+		};
+		return grad;
+	}
+
+	// public static Gradient 
 
 	public static bool IsInsideInvisibleBox2D(this Vector2 pos, Vector2 min, Vector2 max) {
 		return pos.x >= min.x && pos.x <= max.x && pos.y >= min.y && pos.y <= max.y;
@@ -60,6 +77,17 @@ public static class Extensions {
 			ms.Position = 0;
 			return (T)formatter.Deserialize(ms);
 		}
+	}
+
+	public static string MakeEnumReadable<TEnum>(this TEnum t)where TEnum : struct, IConvertible {
+		string entry = t.ToString();
+		for (int i = 1; i < entry.Length; i++) {
+			if (entry[i].IsUpper()) {
+				entry = entry.Insert(i, " ");
+				i++;
+			}
+		}
+		return entry;
 	}
 
 	// from freya holmér <3
