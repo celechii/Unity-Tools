@@ -1,24 +1,23 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
-[RequireComponent(typeof(SpriteRenderer))]
-public class SimpleAnimator : MonoBehaviour {
+public abstract class SimpleAnimator : MonoBehaviour {
 
 	[SerializeField]
 	private bool playOnStart = true;
 	[SerializeField]
 	private PlayType playType;
 	[SerializeField]
-	private Sprite[] frames;
-	[Space]
-	[SerializeField]
 	private int frameRate;
 	[SerializeField]
 	private int frameRateVariation;
 	[SerializeField]
 	private int initialOffset;
+	[Space]
+	[SerializeField]
+	private Frame[] frames;
 
-	private SpriteRenderer spriteRenderer;
 	private int index;
 
 	private void Start() {
@@ -28,26 +27,27 @@ public class SimpleAnimator : MonoBehaviour {
 
 	private IEnumerator Run() {
 
-		spriteRenderer = GetComponent<SpriteRenderer>();
 		float actualFrameRate = frameRate + Random.Range(-frameRateVariation, frameRateVariation);
 
 		if (playType == PlayType.Loop) {
 			while (true) {
+				Frame current = frames[(index + initialOffset) % frames.Length];
+				SetImage(current.frame);
 
-				spriteRenderer.sprite = frames[(index + initialOffset) % frames.Length];
-
-				yield return new WaitForSeconds(1f / actualFrameRate);
+				yield return new WaitForSeconds((float)current.duration / actualFrameRate);
 				index = (index + 1) % frames.Length;
 			}
 
 		} else if (playType == PlayType.Once) {
 
 			for (int i = initialOffset; i < frames.Length; i++) {
-				spriteRenderer.sprite = frames[i];
-				yield return new WaitForSeconds(1f / actualFrameRate);
+				SetImage(frames[i].frame);
+				yield return new WaitForSeconds((float)frames[i].duration / actualFrameRate);
 			}
 		}
 	}
+
+	protected abstract void SetImage(Sprite sprite);
 
 	public void Play() {
 		StartCoroutine(Run());
@@ -58,4 +58,9 @@ public class SimpleAnimator : MonoBehaviour {
 		Once
 	}
 
+	[System.Serializable]
+	private class Frame {
+		public Sprite frame;
+		public int duration = 1;
+	}
 }

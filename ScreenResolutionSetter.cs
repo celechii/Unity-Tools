@@ -5,13 +5,17 @@ public class ScreenResolutionSetter : MonoBehaviour {
 
 	public bool setPrefOnLoad;
 	public int resolutionsFromMax;
-	public bool fullscreen;
 	public Vector2Int targetWindowAspect;
 	public Vector2Int targetResolution;
 	public bool fToToggleFullscreen = true;
 	public UnityEvent OnToggleFullscreen;
 
+	private bool fullscreen;
+
 	private void Awake() {
+
+		fullscreen = PlayerPrefs.GetInt("Screenmanager Fullscreen Mode") == 1;
+
 		if (setPrefOnLoad)
 			SetResolution();
 	}
@@ -38,7 +42,7 @@ public class ScreenResolutionSetter : MonoBehaviour {
 				aspect = (float)targetResolution.y / targetResolution.x;
 			size.x = Mathf.CeilToInt((float)size.y / aspect);
 
-			if (size.y > Screen.width) {
+			if (size.y + 5 > Screen.height) {
 				resolutionsFromMax++;
 				SetResolution();
 				return;

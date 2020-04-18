@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -32,7 +33,45 @@ public static class Extensions {
 		return grad;
 	}
 
-	// public static Gradient 
+	public static T[] ToArray<T>(this HashSet<T> set) {
+		T[] array = new T[set.Count];
+		int count = 0;
+		foreach (T t in set) {
+			array[count] = t;
+			count++;
+		}
+		return array;
+	}
+
+	/// <summary>
+	/// gets u either -1, 0, 1
+	/// </summary>
+	public static float Direction(this float value) {
+		if (value == 0)
+			return 0;
+		return value / Math.Abs(value);
+	}
+
+	/// <summary>
+	/// ok so do smth like
+	/// yield return StartCoroutine(Extensions.DoThingOverTime(duration, elapsed => {
+	/// 	print("im gay");
+	/// }));
+	/// </summary>
+	public static IEnumerator DoThingOverTime(float duration, Action<float> action) {
+		for (float elapsed = 0; elapsed < duration; elapsed += Time.deltaTime) {
+			action.Invoke(elapsed);
+			yield return null;
+		}
+	}
+
+	public static string[] Trim(this string[] s) {
+		for (int i = 0; i < s.Length; i++)
+			s[i] = s[i].Trim();
+		return s;
+	}
+
+	public static bool IsLetter(this char c) => (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 
 	public static bool IsInsideInvisibleBox2D(this Vector2 pos, Vector2 min, Vector2 max) {
 		return pos.x >= min.x && pos.x <= max.x && pos.y >= min.y && pos.y <= max.y;
@@ -78,6 +117,11 @@ public static class Extensions {
 			return (T)formatter.Deserialize(ms);
 		}
 	}
+
+	public static bool IsPointInside(this Bounds bounds, Vector2 point) =>
+		point.x <= bounds.max.x && point.x >= bounds.min.x && point.y <= bounds.max.y && point.y >= bounds.min.y;
+
+	public static int LengthOfEnum<TEnum>(this TEnum t)where TEnum : struct => System.Enum.GetNames(typeof(TEnum)).Length;
 
 	public static string MakeEnumReadable<TEnum>(this TEnum t)where TEnum : struct, IConvertible {
 		string entry = t.ToString();
