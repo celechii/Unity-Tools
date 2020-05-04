@@ -66,10 +66,11 @@ public class ScreenShake : MonoBehaviour {
 		}
 
 		// clamping shit
-		if (output.magnitude < .01f) {
-			if (smoothType == SmoothType.Smooth && velRef.magnitude < .01f)
+		float minValue = .01f;
+		if (output.magnitude < minValue) {
+			if (smoothType == SmoothType.Smooth && velRef.magnitude < minValue)
 				output = velRef = Vector3.zero;
-			else if (smoothType == SmoothType.Spring && springVel.magnitude < .01f)
+			else if (smoothType == SmoothType.Spring && springVel.magnitude < minValue)
 				output = springVel = Vector3.zero;
 		}
 
@@ -85,11 +86,20 @@ public class ScreenShake : MonoBehaviour {
 			transformTarget.position = Output;
 	}
 
+	/// <summary>
+	/// Pushes the target in a direction.
+	/// </summary>
+	/// <param name="direction">The direction of the push.</param>
+	/// <param name="amount">The magnitude of the push</param>
 	public static void Push(Vector2 direction, float amount) => control.DoPush(direction * amount);
 
+	/// <summary>
+	/// Pushes the target in a direction.
+	/// </summary>
+	/// <param name="force">The vector force of the push direction.</param>
 	public static void Push(Vector2 force) => control.DoPush(force);
 
-	public void DoPush(Vector2 force) {
+	private void DoPush(Vector2 force) {
 		if (!enable)
 			return;
 		if (smoothType == SmoothType.Spring)
@@ -98,11 +108,17 @@ public class ScreenShake : MonoBehaviour {
 			output += (Vector3)force;
 	}
 
+	/// <summary>
+	/// Shakes the target some amount of times.
+	/// </summary>
+	/// <param name="intensity">How intense the shake is. For a SmoothType of Smooth this is how far off center it's pushed.</param>
+	/// <param name="numShakes">The number of times to shake.</param>
+	/// <param name="realtime">Should this ignore Time.timeScale?</param>
 	public static void Shake(float intensity, int numShakes, bool realtime = false) {
 		control.StartCoroutine(control.DoShake(intensity, numShakes, realtime));
 	}
 
-	public IEnumerator DoShake(float intensity, int numShakes, bool realtime = false) {
+	private IEnumerator DoShake(float intensity, int numShakes, bool realtime = false) {
 		if (!enable)
 			yield break;
 		for (int i = 0; i < numShakes; i++) {
