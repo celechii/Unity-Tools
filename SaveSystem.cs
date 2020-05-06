@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
-public class SaveSystem : MonoBehaviour {
-
-	public NEvent saveFunction;
-	public NEvent loadFunction;
+public static class SaveSystem {
 
 	private static string path;
-
-	private void Awake() {
-		SetPath();
-	}
 
 	private static void SetPath() {
 		path = Application.dataPath + "/Resources/Saves";
@@ -62,7 +55,7 @@ public class SaveSystem : MonoBehaviour {
 	/// <param name="data">A JSON string for the object.</param>
 	public static void SaveBin(string fileName, object data) {
 		SetPath();
-		string stringData = Encrypt(JsonUtility.ToJson(data));
+		string stringData = JsonUtility.ToJson(data);
 		BinaryFormatter binaryFormatter = new BinaryFormatter();
 		FileStream file = File.Create(path + "/" + fileName);
 		binaryFormatter.Serialize(file, stringData);
@@ -85,74 +78,9 @@ public class SaveSystem : MonoBehaviour {
 		BinaryFormatter binaryFormatter = new BinaryFormatter();
 
 		//json string to return after being deserialized
-		string stringData = Decrypt((string) binaryFormatter.Deserialize(file));
+		string stringData = (string)binaryFormatter.Deserialize(file);
 		file.Close();
 
 		return JsonUtility.FromJson<T>(stringData);
-	}
-
-	/// <summary>
-	/// Tell all GameObjects with a SaveSystem component to save.
-	/// </summary>
-	public static void SaveGame() {
-		SaveSystem[] saveSystems = FindObjectsOfType<SaveSystem>();
-		string saveNames = "";
-		foreach (SaveSystem s in saveSystems) {
-			s.saveFunction.Invoke();
-			if (saveNames != "")
-				saveNames += ", ";
-			saveNames += s.name;
-		}
-	}
-
-	/// <summary>
-	/// Tell all GameObjects with a SaveSystem component to load.
-	/// </summary>
-	public static void LoadGame() {
-		SaveSystem[] saveSystems = FindObjectsOfType<SaveSystem>();
-		string saveNames = "";
-		foreach (SaveSystem s in saveSystems) {
-			s.loadFunction.Invoke();
-			if (saveNames != "")
-				saveNames += ", ";
-			saveNames += s.name;
-		}
-	}
-
-	[ContextMenu("Invoke Load Function")]
-	private void InvokeLoad() {
-		loadFunction.Invoke();
-	}
-
-	[ContextMenu("Invoke Save Function")]
-	private void InvokeSaveFunction() {
-		saveFunction.Invoke();
-	}
-
-	private static string Encrypt(string s) {
-
-		string ns = "";
-		for (int i = s.Length - 1; i >= 0; i--)
-			ns += (char) (s[i] + 3);
-		s = ns;
-
-		string nns = "";
-		for (int i = 0; i < s.Length; i++)
-			nns += (char) (s[i] + (i % 2 == 0 ? 13 : 7));
-		s = nns;
-		return s;
-	}
-
-	private static string Decrypt(string s) {
-		string ns = "";
-		for (int i = 0; i < s.Length; i++)
-			ns += (char) (s[i] - (i % 2 == 0 ? 13 : 7));
-		s = ns;
-
-		string nns = "";
-		for (int i = s.Length - 1; i >= 0; i--)
-			nns += (char) (s[i] - 3);
-
-		return nns;
 	}
 }
