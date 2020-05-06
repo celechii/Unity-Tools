@@ -29,7 +29,7 @@ public static class SaveSystem {
 	/// <param name="data">JSON data string.</param>
 	public static void SaveTxt(string fileName, object data) {
 		SetPath();
-		string stringData = JsonUtility.ToJson(data);
+		string stringData = JsonUtility.ToJson(data, true);
 		StreamWriter writer = new StreamWriter(path + "/" + fileName + ".txt");
 		writer.Write(stringData);
 		writer.Close();
