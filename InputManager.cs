@@ -16,7 +16,7 @@ public class InputManager : MonoBehaviour {
 
 		LoadKeyBinds();
 		BuildLookup();
-	}t
+	}
 
 	public bool GetKeyDown(string name, bool negative = false) {
 		CheckNameValid(name);
