@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,18 +16,7 @@ public class InputManager : MonoBehaviour {
 
 		LoadKeyBinds();
 		BuildLookup();
-	}
-
-	private void Update() {
-		if (GetKeyDown("test"))
-			print("boop");
-
-		if (Input.GetKeyDown(KeyCode.Tab))
-			RebindKey("test");
-		if (Input.GetKeyDown(KeyCode.R))
-			ResetBinding("test");
-
-	}
+	}t
 
 	public bool GetKeyDown(string name, bool negative = false) {
 		CheckNameValid(name);
