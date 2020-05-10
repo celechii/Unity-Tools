@@ -1,10 +1,11 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class InputManager : MonoBehaviour {
 
 	public bool isRebinding;
+	public KeyCode cancelRebindKey = KeyCode.Escape;
 	[SerializeField]
 	private Keybinds keyBinds;
 
@@ -16,6 +17,11 @@ public class InputManager : MonoBehaviour {
 
 		LoadKeyBinds();
 		BuildLookup();
+	}
+
+	private void Update() {
+		if (GetKeyDown("test"))
+			print("boop");
 	}
 
 	public bool GetKeyDown(string name, bool negative = false) {
@@ -98,6 +104,11 @@ public class InputManager : MonoBehaviour {
 		yield return null;
 
 		while (isRebinding) {
+			if (Input.GetKeyDown(cancelRebindKey)) {
+				isRebinding = false;
+				break;
+			}
+
 			if (Input.anyKeyDown) {
 				for (int i = 0; i < numKeyCodes; i++) {
 					if (Input.GetKeyDown((KeyCode)i)) {
