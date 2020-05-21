@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour {
 
+	private static InputManager control;
+
 	public bool isRebinding;
 	public KeyCode cancelRebindKey = KeyCode.Escape;
 	[SerializeField]
@@ -13,6 +15,7 @@ public class InputManager : MonoBehaviour {
 	private int numKeyCodes;
 
 	private void Awake() {
+		control = this;
 		numKeyCodes = System.Enum.GetNames(typeof(KeyCode)).Length;
 
 		LoadKeyBinds();
@@ -24,9 +27,9 @@ public class InputManager : MonoBehaviour {
 	/// </summary>
 	/// <param name="name">The name of the input.</param>
 	/// <param name="negative">Should access the negative value? Default is positive.</param>
-	public bool GetKeyDown(string name, bool negative = false) {
-		CheckNameValid(name);
-		InputAction action = lookup[name];
+	public static bool GetKeyDown(string name, bool negative = false) {
+		control.CheckNameValid(name);
+		InputAction action = control.lookup[name];
 
 		return Input.GetKeyDown(negative?action.modifiedNegative : action.modifiedPositive);
 	}
@@ -36,9 +39,9 @@ public class InputManager : MonoBehaviour {
 	/// </summary>
 	/// <param name="name">The name of the input.</param>
 	/// <param name="negative">Should access the negative value? Default is positive.</param>
-	public bool GetKey(string name, bool negative = false) {
-		CheckNameValid(name);
-		InputAction action = lookup[name];
+	public static bool GetKey(string name, bool negative = false) {
+		control.CheckNameValid(name);
+		InputAction action = control.lookup[name];
 
 		return Input.GetKey(negative?action.modifiedNegative : action.modifiedPositive);
 	}
@@ -48,9 +51,9 @@ public class InputManager : MonoBehaviour {
 	/// </summary>
 	/// <param name="name">The name of the input.</param>
 	/// <param name="negative">Should access the negative value? Default is positive.</param>
-	public bool GetKeyUp(string name, bool negative = false) {
-		CheckNameValid(name);
-		InputAction action = lookup[name];
+	public static bool GetKeyUp(string name, bool negative = false) {
+		control.CheckNameValid(name);
+		InputAction action = control.lookup[name];
 
 		return Input.GetKeyUp(negative?action.modifiedNegative : action.modifiedPositive);
 	}
@@ -60,32 +63,32 @@ public class InputManager : MonoBehaviour {
 	/// </summary>
 	/// <param name="name">The name of the input.</param>
 	/// <param name="negative">Should access the negative value? Default is positive.</param>
-	public KeyCode GetBinding(string name, bool negative = false) => negative ? lookup[name].modifiedNegative : lookup[name].modifiedPositive;
+	public static KeyCode GetBinding(string name, bool negative = false) => negative ? control.lookup[name].modifiedNegative : control.lookup[name].modifiedPositive;
 
 	/// <summary>
 	/// Returns -1 if the negative key is pressed, 1 if the positive key is pressed, and 0 if both or neither.
 	/// </summary>
 	/// <param name="name">The name of the input.</param>
-	public int GetAxis(string name) => (GetKey(name) ? 1 : 0) + (GetKey(name, true) ? 1 : 0);
+	public static int GetAxis(string name) => (GetKey(name) ? 1 : 0) + (GetKey(name, true) ? -1 : 0);
 
 	/// <summary>
 	/// Has either of the keys on the axis been pressed this frame?
 	/// </summary>
 	/// <param name="name">The name of the input.</param>
-	public bool GetAxisDown(string name) => GetKeyDown(name) || GetKeyDown(name, true);
+	public static bool GetAxisDown(string name) => GetKeyDown(name) || GetKeyDown(name, true);
 
 	/// <summary>
 	/// Has either of the keys on the axis been released this frame?
 	/// </summary>
 	/// <param name="name">The name of the input.</param>
-	public bool GetAxisUp(string name) => GetKeyUp(name) || GetKeyUp(name, true);
+	public static bool GetAxisUp(string name) => GetKeyUp(name) || GetKeyUp(name, true);
 
 	/// <summary>
 	/// Sets the bindings of all keys back to their defaults.
 	/// </summary>
-	public void ResetAllBindings() {
-		for (int i = 0; i < keyBinds.actions.Length; i++)
-			keyBinds.actions[i].ResetBindings();
+	public static void ResetAllBindings() {
+		for (int i = 0; i < control.keyBinds.actions.Length; i++)
+			control.keyBinds.actions[i].ResetBindings();
 		SaveKeyBinds();
 	}
 
@@ -94,10 +97,10 @@ public class InputManager : MonoBehaviour {
 	/// </summary>
 	/// <param name="name">The name of the input.</param>
 	/// <param name="negative">Should access the negative value? Default is positive.</param>
-	public void ResetBinding(string name, bool negative = false) {
-		CheckNameValid(name);
+	public static void ResetBinding(string name, bool negative = false) {
+		control.CheckNameValid(name);
 
-		lookup[name].ResetBinding(negative);
+		control.lookup[name].ResetBinding(negative);
 		SaveKeyBinds();
 	}
 
@@ -112,8 +115,8 @@ public class InputManager : MonoBehaviour {
 	/// <summary>
 	/// Uses the save system to save the keybind JSON to /Resources/Saves/Keybinds.txt
 	/// </summary>
-	public void SaveKeyBinds() {
-		SaveSystem.SaveTxt("Keybinds", keyBinds);
+	public static void SaveKeyBinds() {
+		SaveSystem.SaveTxt("Keybinds", control.keyBinds);
 	}
 
 	/// <summary>

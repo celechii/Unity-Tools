@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ScreenShake : MonoBehaviour {
 
-	private static ScreenShake staticRef;
+	public static ScreenShake staticRef;
 
 	[HideInInspector] public bool enable = true; // makes the shake n push methods do nothin
 	[HideInInspector] public bool isPaused = false; // pause the shit
