@@ -46,6 +46,22 @@ public class RangeFloat {
 	}
 
 	/// <summary>
+	/// Sets the value to the max and returns it.
+	/// </summary>
+	public float ToMax() {
+		value = max;
+		return max;
+	}
+
+	/// <summary>
+	/// Sets the value to the min and returns it.
+	/// </summary>
+	public float ToMin() {
+		value = min;
+		return min;
+	}
+
+	/// <summary>
 	/// Sets a random float value between the min and the max (inclusive).
 	/// </summary>
 	public void SetValueToRandomFloat() {
@@ -56,7 +72,7 @@ public class RangeFloat {
 	/// Sets a random int value between the min and the max (inclusive).
 	/// </summary>
 	public void SetValueToRandomInt() {
-		value = (float) GetRandomInt();
+		value = (float)GetRandomInt();
 	}
 
 	/// <summary>
@@ -88,10 +104,24 @@ public class RangeFloat {
 	}
 
 	/// <summary>
+	/// Returns a value t% between the min and max according to an animation curve.
+	/// </summary>
+	public float GetAtWith(float t, AnimationCurve curve) {
+		return curve.Evaluate(GetAt(t));
+	}
+
+	/// <summary>
 	/// Returns a value t% between the min and max, but also maybe outside of them, cause unclamped and stuff.
 	/// </summary>
 	public float GetUnclampedAt(float t) {
 		return Mathf.LerpUnclamped(min, max, t);
+	}
+
+	/// <summary>
+	/// Returns a value t% between the min and max, but also maybe outside of them, cause unclamped and stuff.
+	/// </summary>
+	public float GetUnclampedAtWith(float t, AnimationCurve curve) {
+		return curve.Evaluate(GetUnclampedAt(t));
 	}
 
 	/// <summary>
@@ -102,10 +132,24 @@ public class RangeFloat {
 	}
 
 	/// <summary>
-	/// Returns the percent of value.
+	/// Returns how far into the range a value is, then scales it according to an animation curve.
+	/// </summary>
+	public float GetPercentWith(float value, AnimationCurve curve) {
+		return curve.Evaluate(GetPercent(value));
+	}
+
+	/// <summary>
+	/// Returns how far in % the value is between the min and max.
 	/// </summary>
 	public float GetPercentOfValue() {
 		return GetPercent(value);
+	}
+
+	/// <summary>
+	/// Returns how far in % the value is between the min and max, scaling with an animation curve.
+	/// </summary>
+	public float GetPercentOfValueWith(AnimationCurve curve) {
+		return curve.Evaluate(GetPercent(value));
 	}
 
 	/// <summary>
