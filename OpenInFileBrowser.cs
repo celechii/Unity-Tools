@@ -1,4 +1,7 @@
-﻿public static class OpenInFileBrowser {
+// from http://wiki.unity3d.com/index.php/OpenInFileBrowser
+
+
+public static class OpenInFileBrowser {
 	public static bool IsInMacOS {
 		get {
 			return UnityEngine.SystemInfo.operatingSystem.IndexOf("Mac OS") != -1;
