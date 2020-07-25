@@ -22,6 +22,12 @@ public class InputManager : MonoBehaviour {
 		BuildLookup();
 	}
 
+	private void Update() {
+		foreach (KeyCode k in System.Enum.GetValues(typeof(KeyCode)))
+			if (Input.GetKeyDown(k))
+				print(GetKeyCodeNiceName(k));
+	}
+
 	/// <summary>
 	/// Has the key been pressed this frame?
 	/// </summary>
@@ -174,6 +180,46 @@ public class InputManager : MonoBehaviour {
 		}
 		SaveKeyBinds();
 		callback?.Invoke();
+	}
+
+	public static string GetKeyCodeNiceName(KeyCode key) {
+		switch (key) {
+			case KeyCode.Mouse0:
+				return "Left Mouse Button";
+			case KeyCode.Mouse1:
+				return "Right Mouse Button";
+			case KeyCode.Mouse2:
+				return "Middle Mouse Button";
+			case KeyCode.Mouse3:
+			case KeyCode.Mouse4:
+			case KeyCode.Mouse5:
+			case KeyCode.Mouse6:
+				return "Mouse Button " + ((KeyCode)(int)key - 323);
+			case KeyCode.Alpha0:
+			case KeyCode.Alpha1:
+			case KeyCode.Alpha2:
+			case KeyCode.Alpha3:
+			case KeyCode.Alpha4:
+			case KeyCode.Alpha5:
+			case KeyCode.Alpha6:
+			case KeyCode.Alpha7:
+			case KeyCode.Alpha8:
+			case KeyCode.Alpha9:
+				return ((int)key - 48).ToString();
+			case KeyCode.Keypad0:
+			case KeyCode.Keypad1:
+			case KeyCode.Keypad2:
+			case KeyCode.Keypad3:
+			case KeyCode.Keypad4:
+			case KeyCode.Keypad5:
+			case KeyCode.Keypad6:
+			case KeyCode.Keypad7:
+			case KeyCode.Keypad8:
+			case KeyCode.Keypad9:
+				return "NUM " + ((KeyCode)(int)key - 256);
+			default:
+				return key.MakeEnumReadable();
+		}
 	}
 
 	[System.Serializable]
