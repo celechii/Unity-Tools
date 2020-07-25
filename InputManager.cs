@@ -22,12 +22,6 @@ public class InputManager : MonoBehaviour {
 		BuildLookup();
 	}
 
-	private void Update() {
-		foreach (KeyCode k in System.Enum.GetValues(typeof(KeyCode)))
-			if (Input.GetKeyDown(k))
-				print(GetKeyCodeNiceName(k));
-	}
-
 	/// <summary>
 	/// Has the key been pressed this frame?
 	/// </summary>
