@@ -212,8 +212,20 @@ public class InputManager : MonoBehaviour {
 			case KeyCode.Keypad9:
 				return "NUM " + ((KeyCode)(int)key - 256);
 			default:
-				return key.MakeEnumReadable();
+				return MakeEnumReadable(key);
 		}
+	}
+	
+	// taken from Extensions.cs @ https://github.com/celechii/Unity-Tools/blob/master/Extensions.cs
+	public string MakeEnumReadable<TEnum>(TEnum t) {
+		string entry = t.ToString();
+		for (int i = 1; i < entry.Length; i++) {
+			if (entry[i].IsUpper()) {
+				entry = entry.Insert(i, " ");
+				i++;
+			}
+		}
+		return entry;
 	}
 
 	[System.Serializable]
