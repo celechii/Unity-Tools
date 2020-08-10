@@ -216,7 +216,7 @@ public class InputManager : MonoBehaviour {
 		}
 	}
 
-	public static string MakeKeyReadable(KeyCode key) {
+	public string MakeKeyReadable(KeyCode key) {
 		string entry = key.ToString();
 		for (int i = 1; i < entry.Length; i++) {
 			if (entry[i] >= 'A' && entry[i] <= 'Z') {
