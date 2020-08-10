@@ -212,8 +212,19 @@ public class InputManager : MonoBehaviour {
 			case KeyCode.Keypad9:
 				return "NUM " + ((KeyCode)(int)key - 256);
 			default:
-				return key.MakeEnumReadable();
+				return MakeKeyReadable(key);
 		}
+	}
+
+	public static string MakeKeyReadable(KeyCode key) {
+		string entry = key.ToString();
+		for (int i = 1; i < entry.Length; i++) {
+			if (entry[i] >= 'A' && entry[i] <= 'Z') {
+				entry = entry.Insert(i, " ");
+				i++;
+			}
+		}
+		return entry;
 	}
 
 	[System.Serializable]
