@@ -124,7 +124,7 @@ public class InputManager : MonoBehaviour {
 	/// If nothing is found, it will load the defaults instead.
 	/// </summary>
 	public void LoadKeyBinds() {
-		if (SaveSystem.SaveExists("Keybinds"))
+		if (SaveSystem.SaveExists("Keybinds.txt"))
 			keyBinds = SaveSystem.LoadTxt<Keybinds>("Keybinds");
 		else
 			ResetAllBindings();
@@ -147,9 +147,9 @@ public class InputManager : MonoBehaviour {
 	/// <param name="name">The name of the input.</param>
 	/// <param name="callback">Method to call when the rebinding is complete.</param>
 	/// <param name="negative">Should access the negative value? Default is positive.</param>
-	public void RebindKey(string name, System.Action callback = null, bool negative = false) {
-		CheckNameValid(name);
-		StartCoroutine(RebindInput(name, callback, negative));
+	public static void RebindKey(string name, System.Action callback = null, bool negative = false) {
+		control.CheckNameValid(name);
+		control.StartCoroutine(control.RebindInput(name, callback, negative));
 	}
 
 	private IEnumerator RebindInput(string name, System.Action callback = null, bool negative = false) {
