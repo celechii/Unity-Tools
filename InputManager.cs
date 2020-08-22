@@ -15,7 +15,14 @@ public class InputManager : MonoBehaviour {
 	private int numKeyCodes;
 
 	private void Awake() {
-		control = this;
+
+		if (control != null && control != this) {
+			Destroy(this.gameObject);
+		} else {
+			control = this;
+			DontDestroyOnLoad(this.gameObject);
+		}
+
 		numKeyCodes = System.Enum.GetNames(typeof(KeyCode)).Length;
 
 		LoadKeyBinds();
@@ -149,6 +156,7 @@ public class InputManager : MonoBehaviour {
 	/// <param name="negative">Should access the negative value? Default is positive.</param>
 	public static void RebindKey(string name, System.Action callback = null, bool negative = false) {
 		control.CheckNameValid(name);
+		Debug.Log(control);
 		control.StartCoroutine(control.RebindInput(name, callback, negative));
 	}
 
