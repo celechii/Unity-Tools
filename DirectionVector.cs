@@ -2,6 +2,9 @@
 
 public struct DirectionVector {
 
+	/// <summary>
+	/// The normalized direction. Set this property to change direction.
+	/// </summary>
 	public Vector2 Direction {
 		get => dir;
 		set {
@@ -10,7 +13,17 @@ public struct DirectionVector {
 				nonZero = dir;
 		}
 	}
-	public Vector2 NonZero { get => nonZero; }
+
+	/// <summary>
+	/// The last direction value that wasn't zero.
+	/// </summary>
+	public Vector2 NonZero {
+		get => nonZero;
+	}
+
+	/// <summary>
+	/// The closest cardinal vector direction. Can be zero.
+	/// </summary>
 	public Vector2 Cardinal {
 		get {
 			if (dir == Vector2.zero)
@@ -18,6 +31,10 @@ public struct DirectionVector {
 			return Mathf.Abs(dir.x) >= Mathf.Abs(dir.y) ? Vector2.right * Mathf.Sign(dir.x) : Vector2.up * Mathf.Sign(dir.y);
 		}
 	}
+
+	/// <summary>
+	/// The closest cardinal/intercardinal vector direction. Can be zero.
+	/// </summary>
 	public Vector2 EightDir {
 		get {
 			float[] snaps = new float[] {-1, 0, 1 };
@@ -39,13 +56,12 @@ public struct DirectionVector {
 		Direction = direction;
 	}
 
-	public static implicit operator DirectionVector(Vector2 v) => new DirectionVector(v);
 	public static implicit operator Vector2(DirectionVector dv) => dv.dir;
 
 	public static Vector2 operator *(DirectionVector dv, float f) => dv.dir * f;
 	public static Vector2 operator /(DirectionVector dv, float f) => dv.dir / f;
 	public static bool operator ==(DirectionVector lhs, DirectionVector rhs) => lhs.dir == rhs.dir && lhs.nonZero == rhs.nonZero;
-	public static bool operator ==(DirectionVector dv, Vector2 v) => dv == v;
+	public static bool operator ==(DirectionVector dv, Vector2 v) => dv.dir == v;
 	public static bool operator !=(DirectionVector lhs, DirectionVector rhs) => !(lhs == rhs);
 	public static bool operator !=(DirectionVector dv, Vector2 v) => !(dv == v);
 
