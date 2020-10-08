@@ -41,7 +41,7 @@ public struct DirectionVector {
 	public Vector2 EightDir {
 		get {
 			float[] snaps = new float[] {-1, 0, 1 };
-			return new Vector2(Extensions.RoundToNearest(dir.x, snaps), Extensions.RoundToNearest(dir.y, snaps)).normalized;
+			return new Vector2(RoundToNearest(dir.x, snaps), RoundToNearest(dir.y, snaps)).normalized;
 		}
 	}
 
@@ -61,6 +61,19 @@ public struct DirectionVector {
 			nonZero = dir;
 		this.additionalNonZeroCheck = additionalNonZeroCheck;
 		Direction = direction;
+	}
+
+	private float RoundToNearest(float value, float[] snaps) {
+		float smallestDist = Mathf.Abs(value - snaps[0]);
+		int index = 0;
+		for (int i = 1; i < snaps.Length; i++) {
+			float dist = Mathf.Abs(value - snaps[i]);
+			if (dist < smallestDist) {
+				smallestDist = dist;
+				index = i;
+			}
+		}
+		return snaps[index];
 	}
 
 	public static implicit operator Vector2(DirectionVector dv) => dv.dir;
