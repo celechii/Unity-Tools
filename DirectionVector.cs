@@ -49,10 +49,20 @@ public struct DirectionVector {
 	private Vector2 nonZero;
 	private Func<bool> additionalNonZeroCheck;
 
+	/// <param name="direction">The direction to be normalized.</param>
 	public DirectionVector(Vector2 direction) : this(direction, Vector2.down, null) {}
+
+	/// <param name="direction">The direction to be normalized.</param>
+	/// <param name="nonZeroDefault">The default non-zero direction if the direction has no magnitude.</param>
 	public DirectionVector(Vector2 direction, Vector2 nonZeroDefault) : this(direction, nonZeroDefault, null) {}
+
+	/// <param name="direction">The direction to be normalized.</param>
+	/// <param name="additionalNonZeroCheck">An optional additional check to allow the non-zero value to be updated.</param>
 	public DirectionVector(Vector2 direction, Func<bool> additionalNonZeroCheck) : this(direction, Vector2.down, additionalNonZeroCheck) {}
 
+	/// <param name="direction">The direction to be normalized.</param>
+	/// <param name="nonZeroDefault">The default non-zero direction if the direction has no magnitude.</param>
+	/// <param name="additionalNonZeroCheck">An optional additional check to allow the non-zero value to be updated.</param>
 	public DirectionVector(Vector2 direction, Vector2 nonZeroDefault, Func<bool> additionalNonZeroCheck) {
 		dir = direction.normalized;
 		if (dir == Vector2.zero)
