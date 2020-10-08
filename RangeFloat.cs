@@ -107,7 +107,7 @@ public class RangeFloat {
 	/// Returns a value t% between the min and max according to an animation curve.
 	/// </summary>
 	public float GetAtWith(float t, AnimationCurve curve) {
-		return curve.Evaluate(GetAt(t));
+		return GetAt(curve.Evaluate(t));
 	}
 
 	/// <summary>
@@ -270,4 +270,6 @@ public class RangeFloat {
 		r1.Value = r1.Value / r2.Value;
 		return r1;
 	}
+
+	public override string ToString() => $"{min} -> {max} @ {value} ({(int)(GetPercentOfValue()*100)}%)";
 }
