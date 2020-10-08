@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public struct DirectionVector {
 
@@ -9,8 +10,10 @@ public struct DirectionVector {
 		get => dir;
 		set {
 			dir = value.normalized;
-			if (dir != Vector2.zero)
-				nonZero = dir;
+			if (dir != Vector2.zero) {
+				if (additionalNonZeroCheck == null || additionalNonZeroCheck.Invoke())
+					nonZero = dir;
+			}
 		}
 	}
 
@@ -44,15 +47,19 @@ public struct DirectionVector {
 
 	private Vector2 dir;
 	private Vector2 nonZero;
+	private Func<bool> additionalNonZeroCheck;
 
-	public DirectionVector(Vector2 direction) : this(direction, Vector2.down) {}
+	public DirectionVector(Vector2 direction) : this(direction, Vector2.down, null) {}
+	public DirectionVector(Vector2 direction, Vector2 nonZeroDefault) : this(direction, nonZeroDefault, null) {}
+	public DirectionVector(Vector2 direction, Func<bool> additionalNonZeroCheck) : this(direction, Vector2.down, additionalNonZeroCheck) {}
 
-	public DirectionVector(Vector2 direction, Vector2 nonZeroDefault) {
+	public DirectionVector(Vector2 direction, Vector2 nonZeroDefault, Func<bool> additionalNonZeroCheck) {
 		dir = direction.normalized;
 		if (dir == Vector2.zero)
 			nonZero = nonZeroDefault;
 		else
 			nonZero = dir;
+		this.additionalNonZeroCheck = additionalNonZeroCheck;
 		Direction = direction;
 	}
 
