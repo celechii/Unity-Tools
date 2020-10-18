@@ -96,18 +96,24 @@ public abstract class FuckingAngles {
 		Vector2 direction = b - a;
 		return AngleBetweenV2(direction, offset);
 	}
-
+	
+	/// <summary>
+	/// Adds degrees to an angle accounting for wrapping over 360º and under 0º
+	/// </summary>
+	/// <param name="angle">The initial angle.</param>
+	/// <param name="amount">Degrees to add.</param>
 	public static float AddToAngle(float angle, float amount) {
-		angle += amount;
-		if (angle > 360)
-			while (angle > 360)
-				angle -= 360;
-		else if (angle < 0)
-			while (angle < 0)
-				angle += 360;
+		angle = (amount + angle) % 360f;
+		if (angle < 0)
+			angle = 360f + angle;
 		return angle;
 	}
-
+	
+	/// <summary>
+	/// Returns a perpendicular vector to the vector provided.
+	/// </summary>
+	/// <param name="dir">The direction.</param>
+	/// <param name="direction">Negative value for left, positive value for right.</param>
 	public static Vector2 GetPerpendicular(Vector2 dir, int direction = -1) => new Vector2(dir.y * Mathf.Sign(direction), dir.x * -Mathf.Sign(direction));
 
 }
