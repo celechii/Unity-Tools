@@ -14,12 +14,6 @@ public class ObjectPool : MonoBehaviour {
 		control = this;
 	}
 
-	[Button]
-	private void TestSpawning() {
-		Projectile bullet = Spawn(testPrefab, Vector2.zero).GetComponent<Projectile>();
-		bullet.Initialize(Vector2.zero, new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized);
-	}
-
 	public static GameObject Spawn(GameObject prefab, Vector3 position) => control.SpawnObject(prefab, position);
 
 	private GameObject SpawnObject(GameObject prefab, Vector3 position) {

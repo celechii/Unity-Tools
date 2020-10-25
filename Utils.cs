@@ -22,6 +22,10 @@ public static class Utils {
 	public static float ClampWithMax(float value, float max) => value > max ? max : value;
 	public static float ClampWithMin(float value, float min) => value < min ? min : value;
 
+	public static float FindTime(float speed, float distance) => distance / speed;
+	public static float FindDist(float speed, float time) => speed * time;
+	public static float FindSpeed(float distance, float time) => distance / time;
+
 	public static int IndexOfSmallest(float[] values) {
 		if (values == null || values.Length == 0)
 			throw new Exception("hey what the fuck, give me some values");
