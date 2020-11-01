@@ -214,6 +214,16 @@ public static class Utils {
 	#region Value Extensions
 
 	/// <summary>
+	/// The fractional component of the value.
+	/// </summary>
+	public static float Frac(this float f) => f - (int)f;
+
+	/// <summary>
+	/// The absolute fractional component of the value.
+	/// </summary>
+	public static float AbsFrac(this float f) => Math.Abs(f - (int)f);
+
+	/// <summary>
 	/// Is the character an uppercase letter?
 	/// </summary>
 	public static bool IsUpper(this char c) => c >= 'A' && c <= 'Z';

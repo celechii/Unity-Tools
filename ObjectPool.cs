@@ -8,8 +8,6 @@ public class ObjectPool : MonoBehaviour {
 
 	private Dictionary<GameObject, List<GameObject>> objects = new Dictionary<GameObject, List<GameObject>>();
 
-	public GameObject testPrefab;
-
 	private void Awake() {
 		control = this;
 	}
