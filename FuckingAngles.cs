@@ -10,7 +10,7 @@ public static class FuckingAngles {
 	public static float Angle(float angle) {
 		angle = angle % 360f;
 		if (angle < 0)
-			angle = 360 - angle;
+			angle = 360 + angle;
 		return angle;
 	}
 
@@ -114,7 +114,7 @@ public static class FuckingAngles {
 	/// <param name="selfWorldSpace">Use the ref transform's worldspace position?</param>
 	/// <param name="targetWorldSpace">Use the target transform's worldspace position?</param>
 	public static void RotateTowards(ref Transform trans, Transform target, float maxDegrees = Mathf.Infinity, float offset = 0, bool selfWorldSpace = false, bool targetWorldSpace = false) {
-		RotateTowards(ref trans, targetWorldSpace ? target.position : target.localPosition, offset, maxDegrees, selfWorldSpace);
+		RotateTowards(ref trans, targetWorldSpace ? target.position : target.localPosition, maxDegrees, offset, selfWorldSpace);
 	}
 
 	/// <summary>
