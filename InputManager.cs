@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class InputManager : MonoBehaviour {
 
@@ -10,23 +12,71 @@ public class InputManager : MonoBehaviour {
 	public KeyCode cancelRebindKey = KeyCode.Escape;
 	[SerializeField]
 	private Keybinds keyBinds;
+	[SerializeField]
+	[ValidateInput("SetSingleton")]
+	private List<InputEvent> events = new List<InputEvent>();
 
 	private Dictionary<string, InputAction> lookup;
 	private int numKeyCodes;
 
 	private void Awake() {
-
-		if (control != null && control != this) {
-			Destroy(this.gameObject);
-		} else {
-			control = this;
-			DontDestroyOnLoad(this.gameObject);
-		}
+		control = this;
 
 		numKeyCodes = System.Enum.GetNames(typeof(KeyCode)).Length;
 
 		LoadKeyBinds();
 		BuildLookup();
+	}
+
+	private bool SetSingleton() {
+		if (control == this)
+			return true;
+		control = this;
+		return true;
+	}
+
+	private void Update() {
+		foreach (InputEvent e in events) {
+			switch (e.type) {
+				case InputEventType.OnKeyDown:
+					if (GetKeyDown(e.name, e.negative))
+						e.callback.Invoke();
+					break;
+				case InputEventType.OnKey:
+					if (GetKey(e.name, e.negative))
+						e.callback.Invoke();
+					break;
+				case InputEventType.OnKeyUp:
+					if (GetKeyUp(e.name, e.negative))
+						e.callback.Invoke();
+					break;
+				case InputEventType.OnAxisDown:
+					if (GetAxisDown(e.name))
+						e.callback.Invoke();
+					break;
+				case InputEventType.OnAxisUp:
+					if (GetAxisUp(e.name))
+						e.callback.Invoke();
+					break;
+			}
+		}
+	}
+
+	private string[] GetInputNames() {
+		string[] names = new string[keyBinds.actions.Length];
+		for (int i = 0; i < names.Length; i++)
+			names[i] = keyBinds.actions[i].name;
+		return names;
+	}
+
+	public bool AddListener(string name, bool negative, InputEventType type, UnityAction callback) {
+		if (lookup == null)
+			BuildLookup();
+		if (lookup.ContainsKey(name)) {
+			events.Add(new InputEvent(name, negative, type, callback));
+			return true;
+		} else
+			return false;
 	}
 
 	/// <summary>
@@ -268,5 +318,37 @@ public class InputManager : MonoBehaviour {
 			else
 				modifiedPositive = positive;
 		}
+	}
+
+	[System.Serializable]
+	private class InputEvent {
+		[Dropdown("GetInputNames")]
+		public string name;
+		[AllowNesting]
+		[HideIf("hideNegative")]
+		public bool negative;
+		public InputEventType type;
+		[Space]
+		public UnityEvent callback;
+
+		private bool hideNegative => type == InputEventType.OnAxisDown || type == InputEventType.OnAxisUp;
+
+		public InputEvent(string name, bool negative, InputEventType type, UnityAction callback) {
+			this.name = name;
+			this.negative = negative;
+			this.type = type;
+			this.callback = new UnityEvent();
+			this.callback.AddListener(callback);
+		}
+
+		private string[] GetInputNames() => InputManager.control.GetInputNames();
+	}
+
+	public enum InputEventType {
+		OnKeyDown,
+		OnKey,
+		OnKeyUp,
+		OnAxisDown,
+		OnAxisUp
 	}
 }
