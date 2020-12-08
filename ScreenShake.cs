@@ -71,27 +71,6 @@ public class ScreenShake : MonoBehaviour {
 		if (isPaused)
 			return;
 
-		// ~~ testing shit feel free to delete <3 ~~
-		if (Input.GetKeyDown(KeyCode.Alpha1)) {
-			if (Input.GetKey(KeyCode.LeftShift)) {
-				if (!isStaticReference)
-					Shake(1, 1);
-			} else
-				staticRef.Shake(1, 1);
-		} else if (Input.GetKeyDown(KeyCode.Alpha2)) {
-			if (Input.GetKey(KeyCode.LeftShift)) {
-				if (!isStaticReference)
-					Shake(1, 2);
-			} else
-				staticRef.Shake(1, 2);
-		} else if (Input.GetKeyDown(KeyCode.Alpha3)) {
-			if (Input.GetKey(KeyCode.LeftShift)) {
-				if (!isStaticReference)
-					Shake(1, 3);
-			} else
-				staticRef.Shake(1, 3);
-		}
-
 		// smooth shit
 		if (smoothType == SmoothType.Smooth) {
 			output = Vector3.SmoothDamp(output, Vector3.zero, ref velRef, recenterTime);
