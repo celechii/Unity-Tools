@@ -88,7 +88,8 @@ public class InputManager : MonoBehaviour {
 		control.CheckNameValid(name);
 		InputAction action = control.lookup[name];
 
-		return Input.GetKeyDown(negative?action.modifiedNegative : action.modifiedPositive);
+		return Input.GetKeyDown(negative?action.modifiedNegative1 : action.modifiedPositive1) ||
+			Input.GetKeyDown(negative?action.modifiedNegative2 : action.modifiedPositive2);
 	}
 
 	/// <summary>
@@ -100,7 +101,8 @@ public class InputManager : MonoBehaviour {
 		control.CheckNameValid(name);
 		InputAction action = control.lookup[name];
 
-		return Input.GetKey(negative?action.modifiedNegative : action.modifiedPositive);
+		return Input.GetKey(negative?action.modifiedNegative1 : action.modifiedPositive1) ||
+			Input.GetKey(negative?action.modifiedNegative2 : action.modifiedPositive2);
 	}
 
 	/// <summary>
@@ -112,15 +114,22 @@ public class InputManager : MonoBehaviour {
 		control.CheckNameValid(name);
 		InputAction action = control.lookup[name];
 
-		return Input.GetKeyUp(negative?action.modifiedNegative : action.modifiedPositive);
+		return Input.GetKeyUp(negative?action.modifiedNegative1 : action.modifiedPositive1) ||
+			Input.GetKeyUp(negative?action.modifiedNegative1 : action.modifiedPositive1);
 	}
 
 	/// <summary>
 	/// Get the keycode of the input.
 	/// </summary>
 	/// <param name="name">The name of the input.</param>
+	/// <param name="primary">Should query the primary bindings?</param>
 	/// <param name="negative">Should access the negative value? Default is positive.</param>
-	public static KeyCode GetBinding(string name, bool negative = false) => negative ? control.lookup[name].modifiedNegative : control.lookup[name].modifiedPositive;
+	public static KeyCode GetBinding(string name, bool primary = true, bool negative = false) {
+		if (primary)
+			return negative ? control.lookup[name].modifiedNegative1 : control.lookup[name].modifiedPositive1;
+		else
+			return negative ? control.lookup[name].modifiedNegative2 : control.lookup[name].modifiedPositive2;
+	}
 
 	/// <summary>
 	/// Returns -1 if the negative key is pressed, 1 if the positive key is pressed, and 0 if both or neither.
@@ -293,30 +302,53 @@ public class InputManager : MonoBehaviour {
 	[System.Serializable]
 	public class InputAction {
 		public string name;
-		public KeyCode positive;
-		public KeyCode negative;
+		public KeyCode positive1;
+		public KeyCode negative1;
+		[Space]
+		public KeyCode positive2;
+		public KeyCode negative2;
 		[HideInInspector]
-		public KeyCode modifiedPositive;
+		public KeyCode modifiedPositive1;
 		[HideInInspector]
-		public KeyCode modifiedNegative;
+		public KeyCode modifiedNegative1;
+		[HideInInspector]
+		public KeyCode modifiedPositive2;
+		[HideInInspector]
+		public KeyCode modifiedNegative2;
 
-		public void SetKey(KeyCode key, bool negative = false) {
-			if (negative)
-				modifiedNegative = key;
-			else
-				modifiedPositive = key;
+		public void SetKey(KeyCode key, bool primary = true, bool negative = false) {
+			if (primary) {
+				if (negative)
+					modifiedNegative1 = key;
+				else
+					modifiedPositive1 = key;
+			} else {
+				if (negative)
+					modifiedNegative2 = key;
+				else
+					modifiedPositive2 = key;
+			}
 		}
 
 		public void ResetBindings() {
-			modifiedPositive = positive;
-			modifiedNegative = negative;
+			modifiedPositive1 = positive1;
+			modifiedNegative1 = negative1;
+			modifiedPositive2 = positive2;
+			modifiedNegative2 = negative2;
 		}
 
-		public void ResetBinding(bool negative = false) {
-			if (negative)
-				modifiedNegative = this.negative;
-			else
-				modifiedPositive = positive;
+		public void ResetBinding(bool primary = true, bool negative = false) {
+			if (primary) {
+				if (negative)
+					modifiedNegative1 = this.negative1;
+				else
+					modifiedPositive1 = positive1;
+			} else {
+				if (negative)
+					modifiedNegative2 = this.negative2;
+				else
+					modifiedPositive2 = positive2;
+			}
 		}
 	}
 
