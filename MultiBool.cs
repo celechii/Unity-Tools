@@ -96,4 +96,16 @@
 		b.AddFalse();
 		return b;
 	}
+
+	public override string ToString() {
+		int value = count;
+		if (value >= 0 && defaultValue)
+			value++;
+		else if (value <= 0 && !defaultValue) {
+			value--;
+			value *= -1;
+		}
+
+		return $"{(bool)this} ({value})";
+	}
 }
