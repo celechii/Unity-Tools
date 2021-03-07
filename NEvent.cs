@@ -11,3 +11,6 @@ public class NFloatEvent : UnityEvent<float> {}
 
 [System.Serializable]
 public class NBoolEvent : UnityEvent<bool> {}
+
+[System.Serializable]
+public class NStringEvent : UnityEvent<string> {}

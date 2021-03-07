@@ -12,9 +12,23 @@ public class ObjectPool : MonoBehaviour {
 		control = this;
 	}
 
+	public static int NumObjects => control.transform.childCount;
+
+	public static int NumActiveObjects {
+		get {
+			Transform trans = control.transform;
+			int num = 0;
+			for (int i = 0; i < trans.childCount; i++)
+				if (trans.GetChild(i).gameObject.activeSelf)
+					num++;
+			return num;
+		}
+	}
+
 	public static GameObject Spawn(GameObject prefab, Vector3 position) => control.SpawnObject(prefab, position);
 
-	private GameObject SpawnObject(GameObject prefab, Vector3 position) {
+	public GameObject SpawnObject(GameObject prefab, Vector3 position) => SpawnObject(prefab, position, transform);
+	public GameObject SpawnObject(GameObject prefab, Vector3 position, Transform parent) {
 
 		if (objects.ContainsKey(prefab)) {
 			List<GameObject> instances = objects[prefab];
@@ -30,13 +44,16 @@ public class ObjectPool : MonoBehaviour {
 				}
 			}
 
-			GameObject spawn = Instantiate(prefab, position, Quaternion.identity, transform);
+			GameObject spawn = Spawn();
 			instances.Add(spawn);
 			return spawn;
 
 		} else {
-			objects.Add(prefab, new List<GameObject>() { Instantiate(prefab, position, Quaternion.identity, transform) });
+			objects.Add(prefab, new List<GameObject>() { Spawn() });
 			return objects[prefab][0];
 		}
+
+		GameObject Spawn() => Instantiate(prefab, position, Quaternion.identity, parent);
 	}
+
 }
