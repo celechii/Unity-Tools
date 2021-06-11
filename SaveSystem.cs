@@ -166,10 +166,7 @@ public static class SaveSystem {
 
 	[System.Serializable]
 	public class SaveData {
-		public float randomSaveValue = Random.value;
-		public YarnVariables.YarnVariable[] yarnVariables = new YarnVariables.YarnVariable[0];
-		public Vector2 playerPos;
-		public int[] playerCards;
+
 	}
 }
 
