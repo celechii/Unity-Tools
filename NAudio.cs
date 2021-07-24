@@ -1,56 +1,71 @@
 ﻿using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public static class NAudio {
 
 	private static List<AudioSourceLink> sources = new List<AudioSourceLink>();
 
 	private static Transform sourcePool;
-	private static Transform audioListener;
+	private const float DEFAULT_MIN_DIST = 1f;
+	private const float DEFAULT_MAX_DIST = 500f;
+
+	public static float RemapVolume(float targetVolume) => (1 - Mathf.Pow(targetVolume, 1f / 0.2f)) + 2f * targetVolume - 1;
 
 	// multiple sounds, no pitch
-	public static void PlaySound(AudioClip[] sounds) => PlaySound(sounds[Random.Range(0, sounds.Length)]);
-	public static void PlaySound(AudioClip[] sounds, Transform source, bool worldSpace) => PlaySound(sounds[Random.Range(0, sounds.Length)], source, worldSpace);
-	public static void PlaySound(AudioClip[] sounds, Vector3 worldPosition) => PlaySound(sounds[Random.Range(0, sounds.Length)], worldPosition);
+	public static void PlaySound(AudioClip[] sounds, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sounds[Random.Range(0, sounds.Length)], volume, mixerGroup);
+	public static void PlaySound(AudioClip[] sounds, Transform source, bool worldSpace, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sounds[Random.Range(0, sounds.Length)], source, worldSpace, volume, mixerGroup);
+	public static void PlaySound(AudioClip[] sounds, Vector3 worldPosition, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sounds[Random.Range(0, sounds.Length)], worldPosition, volume, mixerGroup);
 
 	// multiple sounds, pitch range
-	public static void PlaySound(AudioClip[] sounds, float minPitch, float maxPitch) => PlaySound(sounds[Random.Range(0, sounds.Length)], minPitch, maxPitch);
-	public static void PlaySound(AudioClip[] sounds, float minPitch, float maxPitch, Transform source, bool worldSpace) => PlaySound(sounds[Random.Range(0, sounds.Length)], minPitch, maxPitch, source, worldSpace);
-	public static void PlaySound(AudioClip[] sounds, float minPitch, float maxPitch, Vector3 worldPosition) => PlaySound(sounds[Random.Range(0, sounds.Length)], minPitch, maxPitch, worldPosition);
+	public static void PlaySound(AudioClip[] sounds, float minPitch, float maxPitch, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sounds[Random.Range(0, sounds.Length)], minPitch, maxPitch, volume, mixerGroup);
+	public static void PlaySound(AudioClip[] sounds, float minPitch, float maxPitch, Transform source, bool worldSpace, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sounds[Random.Range(0, sounds.Length)], minPitch, maxPitch, source, worldSpace, volume, mixerGroup);
+	public static void PlaySound(AudioClip[] sounds, float minPitch, float maxPitch, Vector3 worldPosition, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sounds[Random.Range(0, sounds.Length)], minPitch, maxPitch, worldPosition, volume, mixerGroup);
 
 	// multiple sounds, single pictch
-	public static void PlaySound(AudioClip[] sounds, float pitch) => PlaySound(sounds[Random.Range(0, sounds.Length)], pitch);
-	public static void PlaySound(AudioClip[] sounds, float pitch, Transform source, bool worldSpace) => PlaySound(sounds[Random.Range(0, sounds.Length)], pitch, source, worldSpace);
-	public static void PlaySound(AudioClip[] sounds, float pitch, Vector3 worldPosition) => PlaySound(sounds[Random.Range(0, sounds.Length)], pitch, worldPosition);
+	public static void PlaySound(AudioClip[] sounds, float pitch, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sounds[Random.Range(0, sounds.Length)], pitch, mixerGroup);
+	public static void PlaySound(AudioClip[] sounds, float pitch, Transform source, bool worldSpace, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sounds[Random.Range(0, sounds.Length)], pitch, source, worldSpace, volume, mixerGroup);
+	public static void PlaySound(AudioClip[] sounds, float pitch, Vector3 worldPosition, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sounds[Random.Range(0, sounds.Length)], pitch, worldPosition, volume, mixerGroup);
 
 	// single sound, no pitch
-	public static void PlaySound(AudioClip sound) => PlaySound(sound, 1);
-	public static void PlaySound(AudioClip sound, Transform source, bool worldSpace) => PlaySound(sound, 1, source, worldSpace);
-	public static void PlaySound(AudioClip sound, Vector3 worldPosition) => PlaySound(sound, 1, worldPosition);
+	public static void PlaySound(AudioClip sound, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sound, 1, mixerGroup);
+	public static void PlaySound(AudioClip sound, Transform source, bool worldSpace, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sound, 1, source, worldSpace, volume, mixerGroup);
+	public static void PlaySound(AudioClip sound, Vector3 worldPosition, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sound, 1, worldPosition, volume, mixerGroup);
 
 	// single sound, pitch range
-	public static void PlaySound(AudioClip sound, float minPitch, float maxPitch) => PlaySound(sound, minPitch, maxPitch, sourcePool, true);
-	public static void PlaySound(AudioClip sound, float minPitch, float maxPitch, Transform source, bool worldSpace) => PlaySound(sound, Random.Range(minPitch, maxPitch), source, worldSpace);
-	public static void PlaySound(AudioClip sound, float minPitch, float maxPitch, Vector3 worldPosition) => PlaySound(sound, Random.Range(minPitch, maxPitch), worldPosition);
+	public static void PlaySound(AudioClip sound, float minPitch, float maxPitch, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sound, minPitch, maxPitch, sourcePool, true, volume, mixerGroup);
+	public static void PlaySound(AudioClip sound, float minPitch, float maxPitch, Transform source, bool worldSpace, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sound, Random.Range(minPitch, maxPitch), source, worldSpace, volume, mixerGroup);
+	public static void PlaySound(AudioClip sound, float minPitch, float maxPitch, Vector3 worldPosition, float volume = 1f, AudioMixerGroup mixerGroup = null) => PlaySound(sound, Random.Range(minPitch, maxPitch), worldPosition, volume, mixerGroup);
 
 	// single sound, single pitch
-	public static void PlaySound(AudioClip sound, float pitch) => PlaySound(sound, pitch, audioListener, true);
+	public static void PlaySound(AudioClip sound, float pitch, float volume = 1f, AudioMixerGroup mixerGroup = null, float minDist = DEFAULT_MIN_DIST, float maxDist = DEFAULT_MAX_DIST) {
+		AudioSource2DLink link = FindLink<AudioSource2DLink>();
+		if (link == null) {
+			link = new AudioSource2DLink(mixerGroup);
+			sources.Add(link);
+		} else
+			link.UpdateLink(mixerGroup);
+		link.PlaySound(sound, volume, pitch, minDist, maxDist);
+	}
 
-	public static void PlaySound(AudioClip sound, float pitch, Transform source, bool worldSpace) {
+	public static void PlaySound(AudioClip sound, float pitch, Transform source, bool worldSpace, float volume = 1f, AudioMixerGroup mixerGroup = null, float minDist = DEFAULT_MIN_DIST, float maxDist = DEFAULT_MAX_DIST) {
 		AudioSourceTransformLink link = FindLink<AudioSourceTransformLink>();
 		if (link == null) {
-			link = new AudioSourceTransformLink(source, worldSpace);
+			link = new AudioSourceTransformLink(source, worldSpace, mixerGroup);
 			sources.Add(link);
-		}
-		link.PlaySound(sound, pitch);
+		} else
+			link.UpdateLink(source, worldSpace, mixerGroup, minDist, maxDist);
+		link.PlaySound(sound, volume, pitch, minDist, maxDist);
 	}
-	public static void PlaySound(AudioClip sound, float pitch, Vector3 position) {
+	public static void PlaySound(AudioClip sound, float pitch, Vector3 position, float volume = 1f, AudioMixerGroup mixerGroup = null, float minDist = DEFAULT_MIN_DIST, float maxDist = DEFAULT_MAX_DIST) {
 		AudioSourcePositionLink link = FindLink<AudioSourcePositionLink>();
 		if (link == null) {
-			link = new AudioSourcePositionLink(position);
+			link = new AudioSourcePositionLink(position, mixerGroup);
 			sources.Add(link);
-		}
-		link.PlaySound(sound, pitch);
+		} else
+			link.UpdateLink(position, mixerGroup);
+		link.PlaySound(sound, volume, pitch, minDist, maxDist);
 	}
 
 	private static T FindLink<T>()where T : AudioSourceLink {
@@ -61,7 +76,6 @@ public static class NAudio {
 	}
 
 	private class NAudioUpdater : MonoBehaviour {
-
 		private void Start() {
 			LateUpdate();
 		}
@@ -76,17 +90,17 @@ public static class NAudio {
 	private abstract class AudioSourceLink {
 		private static int sourceCount;
 
-		public AudioSource source;
+		public AudioSource audioSource;
 		public int id;
-		public bool Active => source.isPlaying;
+		public bool Active => audioSource.isPlaying;
 
 		protected abstract void GoToPosition();
 
 		public AudioSourceLink() {
 			id = sourceCount++;
 			GameObject go = new GameObject($"Sound {id}", typeof(AudioSource));
-			source = go.GetComponent<AudioSource>();
-			source.spatialBlend = 1f;
+			audioSource = go.GetComponent<AudioSource>();
+			audioSource.spatialBlend = 1f;
 
 			if (NAudio.sourcePool == null)
 				NAudio.sourcePool = new GameObject("Audio Pool", typeof(NAudioUpdater)).transform;
@@ -98,34 +112,100 @@ public static class NAudio {
 				GoToPosition();
 		}
 
-		public void PlaySound(AudioClip clip, float pitch) {
-			source.clip = clip;
-			source.pitch = pitch;
-			source.Play();
+		public void PlaySound(AudioClip clip, float volume, float pitch, float minDist, float maxDist) {
+			audioSource.volume = NAudio.RemapVolume(volume);
+			audioSource.minDistance = minDist;
+			audioSource.maxDistance = maxDist;
+			audioSource.clip = clip;
+			audioSource.pitch = pitch;
+			audioSource.Play();
+		}
+	}
+
+	private class AudioSource2DLink : AudioSourceLink {
+
+		public AudioSource2DLink(AudioMixerGroup mixerGroup) : base() {
+			audioSource.spatialBlend = 0;
+			UpdateLink(mixerGroup);
+		}
+
+		protected override void GoToPosition() {}
+
+		public void UpdateLink(AudioMixerGroup mixerGroup) {
+			audioSource.outputAudioMixerGroup = mixerGroup;
 		}
 	}
 
 	private class AudioSourceTransformLink : AudioSourceLink {
-
-		private Transform track;
+		private Transform source;
 		private bool worldSpace;
 
-		public AudioSourceTransformLink(Transform transformTracker, bool worldSpace) : base() {
-			track = transformTracker;
-			this.worldSpace = worldSpace;
+		public AudioSourceTransformLink(Transform transformTracker, bool worldSpace, AudioMixerGroup mixerGroup = null, float minDist = DEFAULT_MIN_DIST, float maxDist = DEFAULT_MAX_DIST) : base() {
+			UpdateLink(transformTracker, worldSpace, mixerGroup, minDist, maxDist);
 		}
 
 		protected override void GoToPosition() {
-			source.transform.localPosition = worldSpace ? track.position : track.localPosition;
+			base.audioSource.transform.localPosition = worldSpace ? source.position : source.localPosition;
+		}
+
+		public void UpdateLink(Transform newSource, bool worldSpace, AudioMixerGroup mixerGroup, float minDist, float maxDist) {
+			source = newSource;
+			audioSource.outputAudioMixerGroup = mixerGroup;
+			audioSource.minDistance = minDist;
+			audioSource.maxDistance = maxDist;
+			this.worldSpace = worldSpace;
+			UpdatePosition();
 		}
 	}
 
 	private class AudioSourcePositionLink : AudioSourceLink {
-
-		public AudioSourcePositionLink(Vector3 worldPosition) : base() =>
-			source.transform.localPosition = worldPosition;
+		public AudioSourcePositionLink(Vector3 worldPosition, AudioMixerGroup mixerGroup) : base() =>
+			UpdateLink(worldPosition, mixerGroup);
 
 		protected override void GoToPosition() {}
 
+		public void UpdateLink(Vector3 newPosition, AudioMixerGroup mixerGroup) {
+			audioSource.transform.localPosition = newPosition;
+			audioSource.outputAudioMixerGroup = mixerGroup;
+		}
 	}
+}
+
+[System.Serializable]
+public abstract class NAudioSound {
+	[MinMaxSlider(0f, 3f)]
+	public Vector2 pitchRange = Vector2.one;
+	[Range(0, 1)]
+	public float volume = 1f;
+	public RangeFloat distRange = new RangeFloat(1, 500);
+	[Space]
+	public AudioMixerGroup mixerGroup;
+
+	public abstract void Play(Transform source, bool worldSpace);
+	public abstract void Play(Vector3 worldPos);
+	public abstract void Play();
+
+	public float Pitch => Random.Range(pitchRange.x, pitchRange.y);
+}
+
+[System.Serializable]
+public class NSoundClip : NAudioSound {
+	public AudioClip sound;
+
+	public override void Play(Transform source, bool worldSpace) => NAudio.PlaySound(sound, Pitch, source, worldSpace, volume, mixerGroup, distRange.min, distRange.max);
+	public override void Play(Vector3 worldPos) => NAudio.PlaySound(sound, Pitch, worldPos, volume, mixerGroup, distRange.min, distRange.max);
+	public override void Play() => NAudio.PlaySound(sound, Pitch, volume, mixerGroup, distRange.min, distRange.max);
+}
+
+[System.Serializable]
+public class NSoundList : NAudioSound {
+	public AudioClip[] sounds;
+
+	private AudioClip Sound => sounds == null || sounds.Length == 0 ? null : sounds[Random.Range(0, sounds.Length)];
+
+	public(AudioClip, float)GetSoundAndPitch() => (Sound, Pitch);
+
+	public override void Play(Transform source, bool worldSpace) => NAudio.PlaySound(Sound, Pitch, source, worldSpace, volume, mixerGroup, distRange.min, distRange.max);
+	public override void Play(Vector3 worldPos) => NAudio.PlaySound(Sound, Pitch, worldPos, volume, mixerGroup, distRange.min, distRange.max);
+	public override void Play() => NAudio.PlaySound(Sound, Pitch, volume, mixerGroup, distRange.min, distRange.max);
 }
