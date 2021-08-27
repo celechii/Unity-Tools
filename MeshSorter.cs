@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(MeshRenderer))]
-public class TextMeshSorter : MonoBehaviour {
+public class MeshSorter : MonoBehaviour {
 
 	[SerializeField]
 	private string layerName = "UI";
