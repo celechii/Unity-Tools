@@ -17,7 +17,11 @@ public class NameElementsDrawer : PropertyDrawer {
 				name = index + ": ";
 
 			IList list = (IList)obj;
-			name += list[index] == null ? "Empty" : list[index].ToString();
+
+			if (index < list.Count && index >= 0)
+				name += list[index] == null ? "Empty" : list[index].ToString();
+			else
+				return;
 
 			label.text = name;
 
