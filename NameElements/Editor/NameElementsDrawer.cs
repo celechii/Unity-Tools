@@ -24,14 +24,9 @@ public class NameElementsDrawer : PropertyDrawer {
 				return;
 
 			label.text = name;
-
-			EditorGUI.BeginProperty(rect, label, property);
-			EditorGUI.PropertyField(rect, property, label, true);
-
-			EditorGUI.EndProperty();
-		} else {
-			EditorGUI.PropertyField(rect, property);
 		}
+
+		EditorGUI.PropertyField(rect, property, label, true);
 	}
 
 	public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
