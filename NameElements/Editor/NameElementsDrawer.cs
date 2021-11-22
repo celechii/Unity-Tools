@@ -26,7 +26,7 @@ public class NameElementsDrawer : PropertyDrawer {
 
 			EditorGUI.EndProperty();
 		} else {
-			EditorGUI.ObjectField(rect, property);
+			EditorGUI.PropertyField(rect, property);
 		}
 	}
 
