@@ -47,8 +47,6 @@ public class NameElementsDrawer : PropertyDrawer {
 				return;
 
 			label.text = name;
-		} else {
-			label.text = obj.GetType().GetInterfaces()[1]?.ToString();
 		}
 
 		EditorGUI.PropertyField(rect, property, label, true);
