@@ -33,7 +33,7 @@ public class NameElementsDrawer : PropertyDrawer {
 
 		object obj = fieldInfo.GetValue(property.serializedObject.targetObject);
 
-		if (obj != null && obj.GetType().IsArray) {
+		if (obj != null && (obj.GetType().IsArray || typeof(IList).IsAssignableFrom(obj.GetType()))) {
 			int index = int.Parse(property.propertyPath.Split('[', ']')[1]);
 			string name = "";
 			if (((NameElementsAttribute)attribute).drawIndex)
@@ -47,6 +47,8 @@ public class NameElementsDrawer : PropertyDrawer {
 				return;
 
 			label.text = name;
+		} else {
+			label.text = obj.GetType().GetInterfaces()[1]?.ToString();
 		}
 
 		EditorGUI.PropertyField(rect, property, label, true);
