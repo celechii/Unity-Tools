@@ -104,10 +104,14 @@ public static class NAudio {
 			LateUpdate();
 		}
 
-		public void LateUpdate() {
+		private void LateUpdate() {
 			foreach (AudioSourceLink sources in NAudio.sources)
 				if (sources.Active)
 					sources.UpdatePosition();
+		}
+
+		private void OnDestroy() {
+			sources.Clear();
 		}
 	}
 
