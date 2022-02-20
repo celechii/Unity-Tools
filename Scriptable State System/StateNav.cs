@@ -30,7 +30,7 @@ public class StateNav : MonoBehaviour {
 	private enum LogDetail { DontLog, OnlyStateChanges, All }
 
 	/// <summary>
-	/// The current state the tree is in.
+	/// The current state the nav is in.
 	/// </summary>
 	public State CurrentState => path[path.Count - 1];
 	public State PreviousState { get; private set; }
@@ -46,7 +46,6 @@ public class StateNav : MonoBehaviour {
 	private State baseState;
 	public State BaseState => baseState;
 
-	[NameElements]
 	[Tooltip("States that can be transitioned to from any state.")]
 	[SerializeField]
 	private List<State> fromAnyState = new List<State>();
@@ -117,7 +116,7 @@ public class StateNav : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Leaves the state if it's the tree's current state and returns to the previous state.
+	/// Leaves the state if it's the nav's current state and returns to the previous state.
 	/// </summary>
 	/// <param name="state">The state to leave.</param>
 	/// <returns>Returns true if leaving was successful.</returns>
@@ -202,7 +201,6 @@ public class StateNav : MonoBehaviour {
 	/// </summary>
 	/// <param name="parentState">The state to check in the path.</param>
 	/// <param name="includeCurrentState">Does the current state count?</param>
-	/// <returns></returns>
 	public bool IsInChildStateOf(State parentState, bool includeCurrentState = false) {
 		for (int i = path.Count - (includeCurrentState ? 1 : 2); i >= 0; i--) {
 			if (path[i] == parentState)
@@ -223,6 +221,7 @@ public class StateNav : MonoBehaviour {
 			DetailedLog("Path cleared");
 			return true;
 		}
+		DetailedLog($"Path not cleared as current state ({CurrentState}) is not the base state ({BaseState})");
 		return false;
 	}
 
