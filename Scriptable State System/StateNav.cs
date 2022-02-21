@@ -32,7 +32,7 @@ public class StateNav : MonoBehaviour {
 	/// <summary>
 	/// The current state the tree is in.
 	/// </summary>
-	public State CurrentState => path[path.Count - 1];
+	public State CurrentState => path.Count > 0 ? path[path.Count - 1] : null;
 	public State PreviousState { get; private set; }
 	public bool IsInBaseState => CurrentState == baseState;
 
@@ -78,16 +78,19 @@ public class StateNav : MonoBehaviour {
 
 	private void Awake() {
 		path.Clear();
-		path.Add(baseState);
 
-		if (baseStateEnterInvocation == BaseStateEnterInvocation.OnAwake) {
-			baseState.RaiseEnterEvent();
-			DetailedLog("Entered base state on Awake");
+		if (baseState != null) {
+			path.Add(baseState);
+
+			if (baseStateEnterInvocation == BaseStateEnterInvocation.OnAwake) {
+				baseState.RaiseEnterEvent();
+				DetailedLog("Entered base state on Awake");
+			}
 		}
 	}
 
 	private void Start() {
-		if (baseStateEnterInvocation == BaseStateEnterInvocation.OnStart) {
+		if (baseState != null && baseStateEnterInvocation == BaseStateEnterInvocation.OnStart) {
 			baseState.RaiseEnterEvent();
 			DetailedLog("Entered base state on Start");
 		}
@@ -102,6 +105,8 @@ public class StateNav : MonoBehaviour {
 		if (CanMoveTo(state, true)) {
 			PreviousState = CurrentState;
 			path.Add(state);
+
+			TryClearPathIfBase(state);
 
 			PreviousState.RaiseLeftToChildEvent();
 			CurrentState.RaiseEnterEvent();
@@ -127,6 +132,8 @@ public class StateNav : MonoBehaviour {
 
 			path.RemoveAt(path.Count - 1);
 
+			TryClearPathIfBase(state);
+
 			PreviousState.RaiseLeftToParentEvent();
 			CurrentState.RaiseEnterEvent();
 
@@ -150,6 +157,8 @@ public class StateNav : MonoBehaviour {
 			PreviousState = CurrentState;
 			path[path.Count - 1] = state;
 
+			TryClearPathIfBase(state);
+
 			PreviousState.RaiseLeftToSiblingEvent();
 			CurrentState.RaiseEnterEvent();
 
@@ -170,6 +179,12 @@ public class StateNav : MonoBehaviour {
 	public bool CanSwitchTo(State state) => CanSwitchTo(state, false);
 
 	private bool CanMoveTo(State state, bool throwExceptions) {
+		if (CurrentState == null) {
+			if (throwExceptions)
+				throw new NullReferenceException("Can't move to a new state from a null state!");
+			return false;
+		}
+
 		if (throwExceptions && state == null)
 			throw new System.NullReferenceException("Can't move to a null state dingus!! >:0");
 		return CurrentState.childStates.Contains(state) || fromAnyState.Contains(state);
@@ -177,22 +192,28 @@ public class StateNav : MonoBehaviour {
 
 	private bool CanLeave(State state, bool throwExceptions) {
 		if (throwExceptions) {
+			if (path[path.Count - 2] == null)
+				throw new NullReferenceException("Can't leave to a null parent state!");
 			if (state == null)
-				throw new System.NullReferenceException("Can't leave a null state dingus!! >:0");
+				throw new NullReferenceException("Can't leave a null state dingus!! >:0");
 			if (path.Count == 1 && state == CurrentState)
-				throw new System.Exception("You can't leave the base state!");
+				throw new Exception("You can't leave the base state!");
 		}
 		return state == CurrentState && path.Count != 1;
 	}
 
 	private bool CanSwitchTo(State state, bool throwExceptions) {
+		State parentState = path[path.Count - 2];
+
 		if (throwExceptions) {
+			if (parentState == null)
+				throw new NullReferenceException("Can't switch from a null parent state!");
 			if (state == null)
-				throw new System.NullReferenceException("Can't switch to a null state dingus!! >:0");
+				throw new NullReferenceException("Can't switch from a null state dingus!! >:0");
 			if (path.Count == 1)
-				throw new System.Exception("You can't switch out of the base state! Try just regular ol' MoveTo()");
+				throw new Exception("You can't switch out of the base state! Try just regular ol' MoveTo()");
 		}
-		return path[path.Count - 2].childStates.Contains(state);
+		return parentState.childStates.Contains(state);
 	}
 
 	public bool InState(State state) => CurrentState == state;
@@ -239,6 +260,55 @@ public class StateNav : MonoBehaviour {
 		for (int i = 0; i < path.Count; i++)
 			sb.Append($" > {path[i].name}");
 		return sb.ToString().Trim();
+	}
+
+	/// <summary>
+	/// Gets a copy of the path using ToArray().
+	/// </summary>
+	public State[] GetCopyOfPath() {
+		return path.ToArray();
+	}
+
+	/// <summary>
+	/// Initializes the nav with a path of n > 0 states.
+	/// The state at index 0 will become the base state, and the state at index n - 1 will become the current state.
+	/// </summary>
+	/// <param name="path">The path to initialize the nav with.</param>
+	/// <param name="raiseCurrentStateEnter">Should the current state's Entered event be raised after initialization?</param>
+	public void InitializeWithPath(State[] path, bool raiseCurrentStateEnter) {
+		if (path == null)
+			throw new ArgumentNullException("Provided path was null");
+		if (path.Length == 0)
+			throw new System.Exception("Path must have at least 1 state for the base state!");
+
+		baseState = path[0];
+		this.path = new List<State>(path);
+
+		DetailedLog($"Initialized nav with new path of {path.Length} state{(path.Length == 1 ? "" : "s")}");
+
+		if (raiseCurrentStateEnter)
+			CurrentState.RaiseEnterEvent();
+	}
+
+	/// <summary>
+	/// Initializes the nav with a base state.
+	/// Note that if the nav is already initialized, this will replace the base state and not throw any left events on the current state.
+	/// </summary>
+	/// <param name="baseState">The state to use as the base state for the nav.</param>
+	/// <param name="raiseCurrentStateEnter">Should the base state's Entered event be raised after initialization?</param>
+	public void InitializeWithState(State baseState, bool raiseCurrentStateEnter) {
+		if (path == null)
+			throw new ArgumentNullException("Base state cannot be initialized with null");
+
+		this.baseState = baseState;
+
+		path.Clear();
+		path.Add(baseState);
+
+		DetailedLog($"Initialized nav with base state of {baseState.name}");
+
+		if (raiseCurrentStateEnter)
+			CurrentState.RaiseEnterEvent();
 	}
 
 	private void Log(string message) {
